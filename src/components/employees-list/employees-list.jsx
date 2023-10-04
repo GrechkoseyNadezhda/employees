@@ -2,12 +2,12 @@ import EmployeesListItem from "../employees-list-item/employees-list-item";
 
 import "./employees-list.css";
 
-const EmployeesList = () => {
+const EmployeesList = ({ data }) => {
     return (
         <ul className="app-list list-group">
-            <EmployeesListItem />
-            <EmployeesListItem />
-            <EmployeesListItem />
+            {data.map((item) => {
+                return <EmployeesListItem key={item.name} {...item} />;
+            })}
         </ul>
     );
 };
