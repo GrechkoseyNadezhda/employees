@@ -16,18 +16,21 @@ class App extends Component {
                     name: "John",
                     salary: 800,
                     increase: false,
+                    rise: false,
                     id: 1,
                 },
                 {
                     name: "Alex",
                     salary: 5000,
                     increase: true,
+                    rise: false,
                     id: 2,
                 },
                 {
                     name: "Carl",
                     salary: 3000,
                     increase: false,
+                    rise: false,
                     id: 3,
                 },
             ],
@@ -48,6 +51,7 @@ class App extends Component {
             name: name,
             salary: salary,
             increase: false,
+            rise: false,
             id: this.maxId,
         };
 
@@ -58,11 +62,24 @@ class App extends Component {
         });
         this.maxId = this.maxId + 1;
     };
+    onToggleProp = (id, prop) => {
+        this.setState(({ data }) => ({
+            data: data.map((item) => {
+                if (item.id === id) {
+                    return { ...item, [prop]: !item[prop] };
+                }
+                return item;
+            }),
+        }));
+    };
 
     render() {
+        const countIncrease = this.state.data.filter(
+            (item) => item.increase === true
+        ).length;
         return (
             <div className="app">
-                <AppInfo />
+                <AppInfo data={this.state.data} countIncrease={countIncrease} />
                 <div className="search-panel">
                     <SearchPanel />
                     <AppFilter />
@@ -70,6 +87,7 @@ class App extends Component {
                 <EmployeesList
                     data={this.state.data}
                     onDelete={this.deleteItem}
+                    onToggleProp={this.onToggleProp}
                 />
                 <EmployeesAddForm addItem={this.addItem} />
             </div>
