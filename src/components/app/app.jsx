@@ -34,6 +34,8 @@ class App extends Component {
                     id: 3,
                 },
             ],
+            filteredData: [],
+            term: "",
         };
         this.maxId = 4;
     }
@@ -73,19 +75,61 @@ class App extends Component {
         }));
     };
 
+    searchEmp = (items, term) => {
+        if (term.length === 0) {
+            return items;
+        }
+
+        return items.filter((item) => {
+            return item.name.indexOf(term) > -1;
+        });
+    };
+
+    onUpdateSearch = (term) => {
+        this.setState({ term });
+    };
+
+    onFilterEmp = (param) => {
+        this.setState(({ data }) => {
+            if (param === "salary") {
+                return {
+                    filteredData: data.filter((item) => item.salary > 1000),
+                };
+            }
+            if (param === "grow") {
+                return {
+                    filteredData: data.filter((item) => item.increase === true),
+                };
+            }
+            if (param === "all") {
+                return {
+                    filteredData: data,
+                };
+            }
+        });
+    };
+
     render() {
-        const countIncrease = this.state.data.filter(
+        const { data, term, filteredData } = this.state;
+        const countIncrease = data.filter(
             (item) => item.increase === true
         ).length;
+        let visibleData;
+        if (filteredData.length) {
+            visibleData = this.searchEmp(filteredData, term);
+        } else {
+            visibleData = this.searchEmp(data, term);
+        }
+
         return (
             <div className="app">
-                <AppInfo data={this.state.data} countIncrease={countIncrease} />
+                <AppInfo data={visibleData} countIncrease={countIncrease} />
                 <div className="search-panel">
-                    <SearchPanel />
-                    <AppFilter />
+                    <SearchPanel onUpdateSearch={this.onUpdateSearch} />
+                    <AppFilter onFilterEmp={this.onFilterEmp} />
                 </div>
                 <EmployeesList
-                    data={this.state.data}
+                    data={visibleData}
                     onDelete={this.deleteItem}
                     onToggleProp={this.onToggleProp}
                 />
