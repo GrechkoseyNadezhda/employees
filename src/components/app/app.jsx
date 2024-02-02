@@ -34,7 +34,7 @@ class App extends Component {
                     id: 3,
                 },
             ],
-            filteredData: [],
+            filter: "all",
             term: "",
         };
         this.maxId = 4;
@@ -89,44 +89,40 @@ class App extends Component {
         this.setState({ term });
     };
 
-    onFilterEmp = (param) => {
-        this.setState(({ data }) => {
-            if (param === "salary") {
-                return {
-                    filteredData: data.filter((item) => item.salary > 1000),
-                };
-            }
-            if (param === "grow") {
-                return {
-                    filteredData: data.filter((item) => item.increase === true),
-                };
-            }
-            if (param === "all") {
-                return {
-                    filteredData: data,
-                };
-            }
-        });
+    onFilterEmp = (items, filter) => {
+        switch (filter) {
+            case "rise":
+                return items.filter((item) => item.rise);
+            case "moreThen1000":
+                return items.filter((item) => item.salary > 1000);
+            default:
+                return items;
+        }
+    };
+
+    onFilterSelect = (filter) => {
+        this.setState({ filter });
     };
 
     render() {
-        const { data, term, filteredData } = this.state;
-        const countIncrease = data.filter(
-            (item) => item.increase === true
+        const { data, term, filter } = this.state;
+        const employees = this.state.data.length;
+        const increased = this.state.data.filter(
+            (item) => item.increase
         ).length;
-        let visibleData;
-        if (filteredData.length) {
-            visibleData = this.searchEmp(filteredData, term);
-        } else {
-            visibleData = this.searchEmp(data, term);
-        }
-
+        const visibleData = this.onFilterEmp(
+            this.searchEmp(data, term),
+            filter
+        );
         return (
             <div className="app">
-                <AppInfo data={visibleData} countIncrease={countIncrease} />
+                <AppInfo employees={employees} increased={increased} />
                 <div className="search-panel">
                     <SearchPanel onUpdateSearch={this.onUpdateSearch} />
-                    <AppFilter onFilterEmp={this.onFilterEmp} />
+                    <AppFilter
+                        onFilterSelect={this.onFilterSelect}
+                        filter={filter}
+                    />
                 </div>
                 <EmployeesList
                     data={visibleData}
